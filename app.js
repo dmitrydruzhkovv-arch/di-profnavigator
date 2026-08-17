@@ -18,7 +18,7 @@ let S = load();
 let idx = 0;
 
 function blank() {
-  return { v: 1, n: '', w: {}, t: [], p: {}, a: [], d: { wake: '', people: '', hands: '', pay: '' }, s: {}, m: [] };
+  return { v: 1, n: '', w: {}, t: [], pw: [], sc: '', p: {}, a: [], d: { wake: '', people: '', hands: '', pay: '' }, s: {}, m: [] };
 }
 function load() {
   try { const r = JSON.parse(localStorage.getItem(LS)); return r && r.v === 1 ? Object.assign(blank(), r) : blank(); }
@@ -33,9 +33,11 @@ STEPS.push({ k: 'how' });
 STEPS.push({ k: 'worldsIntro' });
 WORLDS.forEach((w, i) => STEPS.push({ k: 'world', i }));
 STEPS.push({ k: 'tried' });
+STEPS.push({ k: 'power' });
 PAIRS.forEach((p, i) => STEPS.push({ k: 'pair', i }));
 STEPS.push({ k: 'anti' });
 STEPS.push({ k: 'day' });
+STEPS.push({ k: 'scale' });
 STEPS.push({ k: 'subj' });
 STEPS.push({ k: 'mathIntro' });
 MATH.forEach((m, i) => STEPS.push({ k: 'math', i }));
@@ -65,7 +67,8 @@ function render() {
   const st = STEPS[idx];
   const R = {
     cover: rCover, how: rHow, worldsIntro: rWorldsIntro, world: rWorld, tried: rTried,
-    pair: rPair, anti: rAnti, day: rDay, subj: rSubj, mathIntro: rMathIntro, math: rMath, finish: rFinish
+    power: rPower, pair: rPair, anti: rAnti, day: rDay, scale: rScale, subj: rSubj,
+    mathIntro: rMathIntro, math: rMath, finish: rFinish
   }[st.k];
   app.innerHTML = '';
   R(st);
@@ -75,11 +78,14 @@ function rCover() {
   app.innerHTML = `
     <section class="lk-cover">
       <div class="lk-kicker">Профнавигатор</div>
-      <h1 class="lk-h1">Тебя не спросят,<br>кем ты хочешь быть</h1>
-      <p class="lk-lead">Потому что честный ответ в 16 лет — «я не знаю, я нигде не работал».
-      Это нормально и это не твоя вина.<br><br>
-      Здесь другое: <b>18 рабочих дней изнутри</b> — как оно на самом деле, включая то, что бесит.
-      Смотришь и отмечаешь, где тебя дёрнуло.</p>
+      <h1 class="lk-h1">Вопрос не «кем»,<br>а <span class="lk-hl">на каком уровне</span></h1>
+      <p class="lk-lead">«Кем ты хочешь быть» — плохой вопрос: честный ответ в 16 лет «я нигде не работал,
+      я не видел». Это не твоя вина.<br><br>
+      Настоящая развилка другая. В любом деле есть тот, кто выполняет, и тот, кто <b>решает</b>:
+      за кем идут люди, деньги и правила. Второе не даётся дипломом — туда доходят через ремесло
+      и четыре навыка, которые тренируются уже сейчас.<br><br>
+      Здесь <b>18 рабочих дней изнутри</b> — с кайфом, с тем, что бесит, и с вертикалью:
+      что у тебя будет под рукой через пять лет, если не остановишься.</p>
       <button class="lk-btn" id="go">Начать · 25–30 минут</button>
       <p style="font-size:13px;color:var(--lk-muted);margin:18px 0 0">
         Никаких имён и телефонов. Всё остаётся в твоём телефоне.</p>
@@ -102,12 +108,18 @@ function rHow() {
       Это данные. Мечты — нет.
     </div>
     <div class="lk-card" style="margin-bottom:14px">
-      <b>3. Считаем набор ЕГЭ как «сколько дверей открыто».</b><br>
+      <b>3. Смотрим не только вход, но и вертикаль.</b><br>
+      У каждого мира показано, кем ты там становишься через 5–7 лет: сколько людей, чьи деньги,
+      какие решения. Выбирать работу по стартовой позиции — то же самое, что судить о лестнице
+      по первой ступеньке.
+    </div>
+    <div class="lk-card" style="margin-bottom:14px">
+      <b>4. Считаем набор ЕГЭ как «сколько дверей открыто».</b><br>
       Главное решение 10 класса — не профессия, а предметы. Задача не угадать судьбу,
       а <b>не закрыть двери зря</b>.
     </div>
     <div class="lk-card" style="margin-bottom:14px">
-      <b>4. Даём 3 способа увидеть своими глазами.</b><br>
+      <b>5. Даём 3 способа увидеть своими глазами.</b><br>
       Дешёвые эксперименты на неделю: сходить, поговорить, попробовать руками.
       Только так неизвестное становится известным.
     </div>
@@ -121,7 +133,7 @@ function rHow() {
 
 function rWorldsIntro() {
   app.innerHTML = `
-    <div class="pn-sect">Часть 1 из 6 · 18 миров</div>
+    <div class="pn-sect">Часть 1 из 8 · 18 миров</div>
     <h2 class="pn-q">Читай как свой вторник</h2>
     <p class="pn-sub">Не «нравится ли профессия», а <b>смог бы ты так жить</b>. У каждого мира есть
     и кайф, и то, что бесит — специально, потому что без второго это реклама, а не правда.</p>
@@ -150,6 +162,8 @@ function rWorld(st) {
       <ul class="pn-day">${w.lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
       <div class="pn-row"><span class="pn-tag pn-tag-up">КАЙФ</span><span>${esc(w.kayf)}</span></div>
       <div class="pn-row"><span class="pn-tag pn-tag-down">БЕСИТ</span><span>${esc(w.besit)}</span></div>
+      ${w.vert ? `<div class="pn-vert"><span class="pn-tag pn-tag-lead">ЧЕРЕЗ 5 ЛЕТ</span>
+        <span>${esc(w.vert)}</span></div>` : ''}
       <div class="pn-meta">
         <b>Кто там работает:</b> ${esc(w.kto)}
         <div class="pn-ege">${w.ege.map(e => `<span>${esc(e)}</span>`).join('')}</div>
@@ -169,7 +183,7 @@ function rWorld(st) {
 
 function rTried() {
   app.innerHTML = `
-    <div class="pn-sect">Часть 2 из 6 · доказательства</div>
+    <div class="pn-sect">Часть 2 из 8 · доказательства</div>
     <h2 class="pn-q">Что ты уже делал по-настоящему</h2>
     <p class="pn-sub">Не «умею» и не «хотел бы» — а <b>делал, и получилось</b>. Хоть один раз.
     Это единственные твёрдые данные о тебе, которые вообще существуют.</p>
@@ -190,10 +204,58 @@ function rTried() {
   document.getElementById('bk').onclick = back;
 }
 
+function rPower() {
+  app.innerHTML = `
+    <div class="pn-sect">Часть 3 из 8 · четыре мышцы</div>
+    <h2 class="pn-q">Из чего вырастает тот, кто решает</h2>
+    <p class="pn-sub">Списки «профессий будущего» бесполезны — их переписывают каждые три года.
+    А вот это нужно <b>в любом мире</b>, чтобы через пять лет ставить задачи, а не получать их:
+    <b>писать понятно · говорить на людях · считать деньги · доводить дело чужими руками</b>.
+    Отмечай только то, что <b>реально делал</b>, хоть раз.</p>
+    <div class="pn-check" id="list">
+      ${POWER.map(p => `<label class="${S.pw.includes(p.id) ? 'is-on' : ''}">
+        <input type="checkbox" data-id="${p.id}" ${S.pw.includes(p.id) ? 'checked' : ''}>
+        <span>${esc(p.t)}</span></label>`).join('')}
+    </div>
+    <div class="pn-legend">Пусто в каком-то из четырёх — не приговор, а список тренировок на этот год.
+    В 16 лет эти мышцы у всех примерно нулевые: разница появляется у тех, кто начал их качать раньше.</div>
+    <div class="pn-nav"><button class="lk-btn" id="go">Дальше</button></div>
+    <button class="pn-back" id="bk">← назад</button>`;
+  app.querySelectorAll('#list input').forEach(inp => inp.onchange = () => {
+    const id = inp.dataset.id;
+    S.pw = inp.checked ? Array.from(new Set(S.pw.concat(id))) : S.pw.filter(x => x !== id);
+    inp.closest('label').classList.toggle('is-on', inp.checked);
+    save();
+  });
+  document.getElementById('go').onclick = next;
+  document.getElementById('bk').onclick = back;
+}
+
+function rScale() {
+  app.innerHTML = `
+    <div class="pn-sect">Часть 7 из 8 · масштаб</div>
+    <h2 class="pn-q">Чем ты хочешь управлять</h2>
+    <p class="pn-sub">Власть бывает разная, и «начальник» — только один из вариантов.
+    Выбери, от чего внутри теплеет. Плохой ответ здесь один: <b>«пусть за меня решают, мне так спокойнее»</b> —
+    это выбор, за который потом платят всю жизнь.</p>
+    <div class="pn-scale" id="list">
+      ${SCALE.map(s => `<button data-id="${s.id}" class="${S.sc === s.id ? 'is-on' : ''}">
+        <span class="pn-scale-ico">${s.ico}</span>
+        <span><b>${esc(s.t)}</b><br><span class="pn-scale-d">${esc(s.d)}</span></span>
+      </button>`).join('')}
+    </div>
+    <div class="pn-legend">Ответ не навсегда. Но он показывает, что тебе тренировать первым.</div>
+    <button class="pn-back" id="bk">← назад</button>`;
+  app.querySelectorAll('#list button').forEach(b => b.onclick = () => {
+    S.sc = b.dataset.id; save(); next();
+  });
+  document.getElementById('bk').onclick = back;
+}
+
 function rPair(st) {
   const p = PAIRS[st.i];
   app.innerHTML = `
-    <div class="pn-sect">Часть 3 из 6 · ${st.i + 1} из ${PAIRS.length}</div>
+    <div class="pn-sect">Часть 4 из 8 · ${st.i + 1} из ${PAIRS.length}</div>
     <h2 class="pn-q">Что скорее твоё?</h2>
     <p class="pn-sub">Оба варианта нормальные. Выбирай то, от чего меньше устанешь за восемь часов.</p>
     <div class="pn-pair">
@@ -210,7 +272,7 @@ function rPair(st) {
 
 function rAnti() {
   app.innerHTML = `
-    <div class="pn-sect">Часть 4 из 6 · антирезюме</div>
+    <div class="pn-sect">Часть 5 из 8 · антирезюме</div>
     <h2 class="pn-q">Чего ты точно НЕ хочешь</h2>
     <p class="pn-sub">Это работает быстрее, чем «хочу»: <b>вычеркнуть проще, чем выбрать</b>.
     Отмечай только то, от чего внутри реально «нет».</p>
@@ -234,7 +296,7 @@ function rAnti() {
 function rDay() {
   const d = S.d;
   app.innerHTML = `
-    <div class="pn-sect">Часть 5 из 6 · день в 27 лет</div>
+    <div class="pn-sect">Часть 6 из 8 · день в 27 лет</div>
     <h2 class="pn-q">Тебе 27. Обычный вторник</h2>
     <p class="pn-sub">Не мечта и не «стану миллионером» — <b>обычный день</b>. Коротко, как думаешь.
     Тут вылезают твои настоящие условия жизни, а не профессии.</p>
@@ -263,7 +325,7 @@ function rDay() {
 
 function rSubj() {
   app.innerHTML = `
-    <div class="pn-sect">Часть 6 из 6 · школа честно</div>
+    <div class="pn-sect">Часть 8 из 8 · школа честно</div>
     <h2 class="pn-q">Предметы: где ты на самом деле</h2>
     <p class="pn-sub">Честно, без «должно быть». Это нужно, чтобы посчитать <b>набор ЕГЭ</b>,
     а не чтобы тебя оценить.</p>
@@ -367,9 +429,36 @@ function analyse(s) {
     if (s.s[sid] === 'n') conflicts.push(`«${w.title}» требует ${e.toLowerCase()}, а ты записал этот предмет как «не тяну»`);
   }));
 
+  // 5. четыре мышцы управления: сколько фактов из трёх набралось в каждой
+  const pw = { w: 0, g: 0, m: 0, f: 0 };
+  s.pw.forEach(id => { const p = POWER.find(x => x.id === id); if (p) pw[p.c]++; });
+  const pwOrder = Object.keys(pw).sort((a, b) => pw[a] - pw[b]);   // слабые первыми
+  const pwTotal = Object.values(pw).reduce((a, b) => a + b, 0);
+  const weak = pwOrder.filter(k => pw[k] <= 1).slice(0, 2);
+  const strong = Object.keys(pw).filter(k => pw[k] >= 2);
+
   const mathScore = s.m.filter(Boolean).length;
-  return { yes, meh, no, tally, top, ege, conflicts, mathScore };
+  const scale = SCALE.find(x => x.id === s.sc) || null;
+  return { yes, meh, no, tally, top, ege, conflicts, mathScore, pw, pwTotal, weak, strong, scale };
 }
+
+/* ── что сказать про выбранный масштаб: маршрут, а не комплимент ── */
+const SCALE_ROUTE = {
+  master: `Ты выбрал мастерство, и это честный выбор — но у него есть ловушка: цена твоего часа упирается
+    в число часов. Обходят её двумя ходами: либо становишься тем, к кому идут за самым сложным
+    (и ставишь свою цену), либо в какой-то момент нанимаешь руки и берёшь на себя ответственность
+    за их работу. Второе — уже управление, и решать это придётся лет через пять.`,
+  team: `Ты хочешь отвечать за людей. Главное, что стоит знать заранее: командиром не назначают с улицы —
+    сначала 3–5 лет внутри дела, чтобы понимать, что именно ты требуешь от людей. Зато потом рост быстрый,
+    потому что желающих отвечать за чужой результат всегда мало.`,
+  system: `Ты влияешь через устройство, а не через людей — код, схема, процесс, правила. Это самая
+    недооценённая власть: тот, кто спроектировал систему, определяет, что смогут делать все остальные.
+    Дальше вырастает в архитектора или в собственный продукт.`,
+  owner: `Ты метишь в хозяина. Правда без прикрас: почти все, кто начал своё сразу после школы, закрылись —
+    не из-за ума, а потому что не знали дела изнутри и не умели считать. Рабочая последовательность:
+    3–5 лет внутри чужого бизнеса (лучше сразу поближе к деньгам и клиенту), параллельно первые свои
+    заработки — и тогда старт с открытыми глазами.`
+};
 
 function encode(s) {
   const bytes = new TextEncoder().encode(JSON.stringify(s));
@@ -454,6 +543,43 @@ function rFinish(_, ro) {
     <div class="pn-res-block">
       <h3>🔢 Математика</h3>
       <div class="lk-card">${mathLine(A.mathScore)}</div>
+    </div>
+
+    <div class="pn-res-block">
+      <h3>⚡ Твоя вертикаль</h3>
+      <div class="lk-card" style="margin-bottom:12px">
+        ${A.scale ? `<b>${A.scale.ico} ${esc(A.scale.t)}</b> — так ты ответил про масштаб.<br><br>
+          ${SCALE_ROUTE[A.scale.id]}` : 'Масштаб не выбран — вернись к вопросу «чем ты хочешь управлять», это ключевой ответ.'}
+      </div>
+      <div class="lk-card" style="margin-bottom:12px">
+        <b>Правило, которое ломает мечты об управлении:</b> руководителем не становятся «сразу после вуза».
+        В управление входят <b>через дело</b> — 3–7 лет внутри домена, чтобы понимать работу тех, кем
+        руководишь. Поэтому вопрос «кем быть» и вопрос «командовать или выполнять» не конкурируют:
+        сначала ремесло, потом рычаг.
+      </div>
+      <div class="pn-power">
+        ${Object.keys(POWER_NAMES).map(k => {
+          const n = A.pw[k], lvl = n >= 2 ? 'ok' : (n === 1 ? 'mid' : 'low');
+          return `<div class="pn-power-row">
+            <div class="pn-power-name">${esc(POWER_NAMES[k].t)}</div>
+            <div class="pn-power-bar"><span class="is-${lvl}" style="width:${(n / 3) * 100}%"></span></div>
+            <div class="pn-power-num lk-mono">${n}/3</div></div>`;
+        }).join('')}
+      </div>
+      ${A.strong.length ? `<div class="lk-card" style="margin-top:12px">
+        <b>Уже есть:</b> ${A.strong.map(k => esc(POWER_NAMES[k].t.toLowerCase())).join(', ')}.
+        Это не «характер», это натренированное — значит, тренируется и остальное.</div>` : ''}
+      ${A.weak.length ? `<div class="pn-warn" style="margin-top:12px">
+        <b>Провисает:</b> ${A.weak.map(k => esc(POWER_NAMES[k].t.toLowerCase())).join(' и ')}.<br><br>
+        ${A.weak.map(k => `<b>${esc(POWER_NAMES[k].t)}.</b> ${esc(POWER_NAMES[k].why)}<br>
+          <span style="color:var(--lk-muted)">Задание на год: ${esc(POWER_NAMES[k].train)}</span>`).join('<br><br>')}
+      </div>` : `<div class="pn-warn" style="margin-top:12px">Все четыре мышцы уже с фактами — редкий случай
+        в 16 лет. Значит, следующий шаг не «начать», а поднять ставку: дело, где под тобой люди старше тебя.</div>`}
+      <div class="lk-card" style="margin-top:12px;font-size:15px;color:var(--lk-muted);line-height:1.5">
+        И честная граница: командовать людьми — не обязанность и не «высший сорт». Мастер, который делает
+        лучше всех, и хозяин своего дела распоряжаются собой ничуть не меньше. Плохо ровно одно —
+        когда за тебя всё решают другие, а ты к этому просто привык.
+      </div>
     </div>
 
     <div class="pn-res-block">
